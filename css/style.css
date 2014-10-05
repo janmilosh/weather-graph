@@ -1,0 +1,97 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #222;
+  background: url('../images/dark_brick_wall.png');
+  color: green;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: " "; /* 1 */
+  display: table; /* 2 */
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.wrapper {
+  width: 1000px;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.row {
+  margin: 0 -10px;
+}
+
+.col {
+  float: left;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.col-10 { width: 10%; }
+.col-20 { width: 20%; }
+.col-30 { width: 30%; }
+.col-40 { width: 40%; }
+.col-50 { width: 50%; }
+.col-60 { width: 60%; }
+.col-70 { width: 70%; }
+.col-80 { width: 80%; }
+.col-90 { width: 90%; }
+.col-100 { width: 100%; }
+
+.centered {
+  float: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1, h2, h3 {
+  margin: 0 0 20px;
+}
+
+#graph {
+  margin-top: 50px;
+}
+
+
+svg {
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+  background: #1b1b1b;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #5A78BB;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+
+text.title,
+text.label {
+  font-family: helvetica;
+  fill: #A9C3F3;
+}
+
+.tick text {
+  font-family: helvetica;
+  fill: #5A78BB;
+}
+
+.line {
+  fill: none;
+  stroke: #00FF21;
+  stroke-width: 1.5px;
+}

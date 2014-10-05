@@ -1,12 +1,14 @@
 var city = 'Columbus';
-var state = 'Ohio';
+var state = 'OH';
 var apiKey = 'e7abc77487d7e3eb';
 var callbackName = 'callback';
-var weatherRequest = 'http://api.wunderground.com/api/' + apiKey + '/hourly/q/' + city+ ',%20' +state + '.json?callback=' + callbackName;
+var wuPrefix = 'http://api.wunderground.com/api/';
+var weatherRequest = wuPrefix + apiKey + '/hourly/forecast/almanac/q/' + city + ',%20' + state + '.json?callback=' + callbackName;
+var normalHigh, normalLow, recordHigh, recordLow;
 
 
-//Get hourly data from weather underground.
-
+//jQuery ajax request for the weather data.
+//This calls the 
 $.ajax({
   url: weatherRequest,
  
@@ -18,42 +20,129 @@ $.ajax({
  
     // work with the response
     success: function( response ) {
-      makeGraph(response.hourly_forecast);
+      var historical = response.almanac;
+      var high = historical.temp_high;
+      var low = historical.temp_low;
+      normalHigh = parseInt(high.normal.F, 10);
+      recordHigh = parseInt(high.record.F, 10);
+      normalLow = parseInt(low.normal.F, 10);
+      recordLow = parseInt(low.record.F, 10);
+
+      makeGraph(response.hourly_forecast, recordHigh, normalHigh, recordLow, normalLow);
     }
 });
 
+//Set up the svg on the page without waiting for data
+var margin = {top: 75, right: 75, bottom: 75, left: 100};
+var height = 500 - margin.top - margin.bottom;
+var width = 800 - margin.left - margin.right;
 
-function makeGraph(dataArray) {
+var svgSelection = d3.select('#graph')
+  .append('svg')
+  .attr('height', height + margin.top + margin.bottom)
+  .attr('width', width + margin.left + margin.right)
+  .append('g')
+  .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
+
+function makeGraph(hourlyDataArray, recordHigh, normalHigh, recordLow, normalLow) {
   var parseDate = d3.time.format('%H %d %m %Y').parse;
   var dateFormat = d3.time.format('%I %p');
 
   //Puts the dates in the proper format
-  dataArray.forEach(function(item) {
-    var hour = item.FCTTIME.hour_padded;
-    var day = item.FCTTIME.mday_padded;
-    var month = item.FCTTIME.mon_padded;
-    var year = item.FCTTIME.year;
+  hourlyDataArray.forEach(function(item) {
+    var timeBase = item.FCTTIME;
+
+    var hour = timeBase.hour_padded;
+    var day = timeBase.mday_padded;
+    var month = timeBase.mon_padded;
+    var year = timeBase.year;
+
     var date = [hour, day, month, year].join(' ');
-    console.log('date', date);
     item.time = parseDate(date);
+
+    item.temp = parseInt(item.temp.english, 10);
   });
 
-  var today = dataArray[0].FCTTIME;
+  var startDateBase = hourlyDataArray[0].FCTTIME;
+  var endDateBase = hourlyDataArray[35].FCTTIME;
+  var startDate = startDateBase.mon_abbrev + ' ' + startDateBase.mday;
+  var endDate = endDateBase.mon_abbrev + ' ' + endDateBase.mday;
+  var endYear = endDateBase.year;
+  console.log(startDateBase);
   
-  var xRange = d3.extent(dataArray, function(d) { return d.time; });
-  var yMax = d3.max(dataArray, function(d) { return d.temp.english; })
+  var xRange = d3.extent(hourlyDataArray, function(d) { return d.time; });
 
-  var margin = {top: 75, right: 75, bottom: 75, left: 100};
-  var height = 500 - margin.top - margin.bottom;
-  var width = 750 - margin.left - margin.right;
-  var svgColor = '#f8f8f8';
+  //We need to find max and min temps for the hourly and the historical data.
+  //First find max and min for hourly, then put values in array and find overall range.
+  var hourlyMax = d3.max(hourlyDataArray, function(d) { return d.temp });
+  var hourlyMin = d3.min(hourlyDataArray, function(d) { return d.temp });
+  var tempMaxMinArray = [hourlyMax, hourlyMin, recordHigh, normalHigh, recordLow, normalLow];
+  var yRange = d3.extent(tempMaxMinArray, function(d) { return d });
 
-  var svgSelection = d3.select('#hourly')
-    .append('svg')
-    .attr('height', height)
-    .attr('width', width)
-    .style('background', svgColor);
+  var xScale = d3.time.scale()
+    .domain(xRange).nice()
+    .range([0, width]);
+  var yScale = d3.scale.linear()
+    .domain(yRange).nice() 
+    .range([height, 0]);
 
+  var line = d3.svg.line()
+    .interpolate('basis')
+    .x(function(d) { return xScale(d.time); })
+    .y(function(d) { return yScale(d.temp); });
+      
+  svgSelection.append('path')
+    .datum(hourlyDataArray)
+    .attr('class', 'line')
+    .attr('d', line);
+
+  var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .orient('bottom')
+    .ticks(d3.time.hours(xRange[0], xRange[1]).length)
+    .tickFormat(dateFormat)
+    .ticks(8);
+
+  var yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient('left')
+    .ticks(8);
   
+  svgSelection.append('g')
+    .attr('class', 'axis')
+    .attr('transform', 'translate(0, ' + height + ')')
+    .call(xAxis);
+
+  svgSelection.append('g')
+    .attr('class', 'axis')
+    .call(yAxis);
+
+  svgSelection.append('text') // Add title, simply append and define text 
+    .attr('class', 'title')   // attributes and position
+    .attr('x', (width/2))
+    .attr('y', 0 - (margin.top/2))
+    .attr('text-anchor', 'middle')
+    .style('font-size', '20px') 
+    .text(city + ', ' + state + ' hourly high');
+
+  svgSelection.append('text') // Add x-axis label, similar to title
+    .attr('class', 'label')
+    .attr('x', (width/2))
+    .attr('y', height + margin.bottom/2)
+    .attr('dy', '16')
+    .attr('text-anchor', 'middle')  
+    .style('font-size', '16px') 
+    .text(startDate + ' to ' + endDate + ', ' + endYear);
+
+  svgSelection.append('text') // Add y-axis label, similar to above, but with transform
+    .attr('class', 'label')
+    .attr('transform', 'rotate(-90)')
+    .attr('y', 0 - margin.left/2)
+    .attr('x', 0 - height/2)
+    .attr('dy', '-20')
+    .attr('text-anchor', 'middle')  
+    .style('font-size', '16px') 
+    .html('Temperature &deg;F'); 
+
 }
