@@ -4,8 +4,6 @@ var apiKey = 'e7abc77487d7e3eb';
 var callbackName = 'callback';
 var wuPrefix = 'http://api.wunderground.com/api/';
 var weatherRequest = wuPrefix + apiKey + '/hourly/forecast/almanac/q/' + city + ',%20' + state + '.json?callback=' + callbackName;
-var normalHigh, normalLow, recordHigh, recordLow;
-
 
 //jQuery ajax request for the weather data.
 //This calls the 
@@ -18,17 +16,9 @@ $.ajax({
     // tell jQuery we're expecting JSONP
     dataType: 'jsonp',
  
-    // work with the response
+    // create a graph with the response
     success: function( response ) {
-      var historical = response.almanac;
-      var high = historical.temp_high;
-      var low = historical.temp_low;
-      normalHigh = parseInt(high.normal.F, 10);
-      recordHigh = parseInt(high.record.F, 10);
-      normalLow = parseInt(low.normal.F, 10);
-      recordLow = parseInt(low.record.F, 10);
-
-      makeGraph(response.hourly_forecast, recordHigh, normalHigh, recordLow, normalLow);
+      makeGraph(response.hourly_forecast, response.almanac, response.forecast);
     }
 });
 
@@ -44,10 +34,19 @@ var svgSelection = d3.select('#graph')
   .append('g')
   .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-
-function makeGraph(hourlyDataArray, recordHigh, normalHigh, recordLow, normalLow) {
+//makeGraph function is called from success function of ajax call.
+function makeGraph(hourlyDataArray, historicalData, forecastDataArray) {
   var parseDate = d3.time.format('%H %d %m %Y').parse;
   var dateFormat = d3.time.format('%I %p');
+
+  //Historical data from almanac, parse temperatures as integers
+  var high = historicalData.temp_high;
+  var low = historicalData.temp_low;
+  
+  var normalHigh = parseInt(high.normal.F, 10);
+  var recordHigh = parseInt(high.record.F, 10);
+  var normalLow = parseInt(low.normal.F, 10);
+  var recordLow = parseInt(low.record.F, 10);
 
   //Puts the dates in the proper format
   hourlyDataArray.forEach(function(item) {
@@ -69,7 +68,6 @@ function makeGraph(hourlyDataArray, recordHigh, normalHigh, recordLow, normalLow
   var startDate = startDateBase.mon_abbrev + ' ' + startDateBase.mday;
   var endDate = endDateBase.mon_abbrev + ' ' + endDateBase.mday;
   var endYear = endDateBase.year;
-  console.log(startDateBase);
   
   var xRange = d3.extent(hourlyDataArray, function(d) { return d.time; });
 
@@ -124,7 +122,7 @@ function makeGraph(hourlyDataArray, recordHigh, normalHigh, recordLow, normalLow
     .attr('y', 0 - (margin.top/2))
     .attr('text-anchor', 'middle')
     .style('font-size', '20px') 
-    .text(city + ', ' + state + ' hourly high');
+    .text(city + ', ' + state + ' hourly temperature');
 
   svgSelection.append('text') // Add x-axis label, similar to title
     .attr('class', 'label')
