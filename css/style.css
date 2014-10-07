@@ -75,7 +75,7 @@ svg {
 .axis path, .axis line {
   fill: none;
   stroke: #5A78BB;
-  stroke-width: 1px;
+  stroke-width: 2px;
   shape-rendering: crispEdges;
 }
 
@@ -85,9 +85,18 @@ text.label {
   fill: #A9C3F3;
 }
 
+.title {
+  font-size: 20px;
+}
+
+.label {
+  font-size: 16px;
+}
+
 .tick text {
   font-family: helvetica;
   fill: #5A78BB;
+  text-transform: lowercase;
 }
 
 .line {

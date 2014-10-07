@@ -1,12 +1,11 @@
-var city = 'Columbus';
-var state = 'OH';
+var city = 'Sunbury';
+var state = 'Ohio';
 var apiKey = 'e7abc77487d7e3eb';
 var callbackName = 'callback';
 var wuPrefix = 'http://api.wunderground.com/api/';
 var weatherRequest = wuPrefix + apiKey + '/hourly/forecast/almanac/q/' + city + ',%20' + state + '.json?callback=' + callbackName;
 
 //jQuery ajax request for the weather data.
-//This calls the 
 $.ajax({
   url: weatherRequest,
  
@@ -47,6 +46,7 @@ function makeGraph(hourlyDataArray, historicalData, forecastDataArray) {
   var recordHigh = parseInt(high.record.F, 10);
   var normalLow = parseInt(low.normal.F, 10);
   var recordLow = parseInt(low.record.F, 10);
+  console.log([recordHigh, recordLow, normalHigh, normalLow]);
 
   //Puts the dates in the proper format
   hourlyDataArray.forEach(function(item) {
@@ -78,6 +78,12 @@ function makeGraph(hourlyDataArray, historicalData, forecastDataArray) {
   var tempMaxMinArray = [hourlyMax, hourlyMin, recordHigh, normalHigh, recordLow, normalLow];
   var yRange = d3.extent(tempMaxMinArray, function(d) { return d });
 
+  if (yRange[0] > 0) {
+    yRange[0] = 0;
+  }
+  if (yRange[1] < 90) {
+    yRange[1] = 90;
+  }
   var xScale = d3.time.scale()
     .domain(xRange).nice()
     .range([0, width]);
@@ -85,11 +91,48 @@ function makeGraph(hourlyDataArray, historicalData, forecastDataArray) {
     .domain(yRange).nice() 
     .range([height, 0]);
 
+  //Bound the record high and record low by a rectangle
+  svgSelection.append('rect')
+    .attr('x', 0)
+    .attr('y', yScale(recordHigh))
+    .attr('height', yScale(recordLow)-yScale(recordHigh))
+    .attr('width', width)
+    .style('fill', '#666')
+    .style('opacity', '0.5')
+
+  //Bound the normal high and normal low by a rectangle
+  svgSelection.append('rect')
+    .attr('x', 0)
+    .attr('y', yScale(normalHigh))
+    .attr('height', yScale(normalLow)-yScale(normalHigh))
+    .attr('width', width)
+    .style('fill', '#222')
+    .style('opacity', '0.5');
+
+  svgSelection.append('text')
+    .attr('class', 'label')
+    .attr('x', width)
+    .attr('y', yScale(recordHigh))
+    .attr('dy', '22')
+    .attr('dx', '-12')
+    .attr('text-anchor', 'end')  
+    .text('record');
+
+  svgSelection.append('text')
+    .attr('class', 'label')
+    .attr('x', width)
+    .attr('y', yScale(normalHigh))
+    .attr('dy', '22')
+    .attr('dx', '-12')
+    .attr('text-anchor', 'end')  
+    .text('normal');
+
+  //Define and add hourly temperature as a line 
   var line = d3.svg.line()
     .interpolate('basis')
     .x(function(d) { return xScale(d.time); })
     .y(function(d) { return yScale(d.temp); });
-      
+
   svgSelection.append('path')
     .datum(hourlyDataArray)
     .attr('class', 'line')
@@ -116,31 +159,44 @@ function makeGraph(hourlyDataArray, historicalData, forecastDataArray) {
     .attr('class', 'axis')
     .call(yAxis);
 
-  svgSelection.append('text') // Add title, simply append and define text 
-    .attr('class', 'title')   // attributes and position
+  svgSelection.append('text')
+    .attr('class', 'title')
     .attr('x', (width/2))
     .attr('y', 0 - (margin.top/2))
     .attr('text-anchor', 'middle')
-    .style('font-size', '20px') 
     .text(city + ', ' + state + ' hourly temperature');
 
-  svgSelection.append('text') // Add x-axis label, similar to title
+  svgSelection.append('text')
     .attr('class', 'label')
     .attr('x', (width/2))
     .attr('y', height + margin.bottom/2)
     .attr('dy', '16')
     .attr('text-anchor', 'middle')  
-    .style('font-size', '16px') 
-    .text(startDate + ' to ' + endDate + ', ' + endYear);
+    .text('Time');
 
-  svgSelection.append('text') // Add y-axis label, similar to above, but with transform
+  svgSelection.append('text')
+    .attr('class', 'label')
+    .attr('x', 0)
+    .attr('y', height + margin.bottom/2)
+    .attr('dy', '16')
+    .attr('text-anchor', 'left')  
+    .text(startDate);
+
+  svgSelection.append('text')
+    .attr('class', 'label')
+    .attr('x', width)
+    .attr('y', height + margin.bottom/2)
+    .attr('dy', '16')
+    .attr('text-anchor', 'end')  
+    .text(endDate);
+
+  svgSelection.append('text')
     .attr('class', 'label')
     .attr('transform', 'rotate(-90)')
     .attr('y', 0 - margin.left/2)
     .attr('x', 0 - height/2)
     .attr('dy', '-20')
     .attr('text-anchor', 'middle')  
-    .style('font-size', '16px') 
-    .html('Temperature &deg;F'); 
+    .html('Temperature &deg;F');
 
 }
