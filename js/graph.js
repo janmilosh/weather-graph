@@ -1,10 +1,9 @@
 $(function() {
-  var city = 'Sunbury';
-  var state = 'Ohio';
   var wuApiKey = 'e7abc77487d7e3eb';
   var wuPrefix = 'http://api.wunderground.com/api/';
-  var weatherRequest = wuPrefix + wuApiKey + '/hourly/forecast/almanac/q/' + city + ',%20' + state + '.json';
   var locationInput = $('#location-input');
+
+  getWeatherData('/q/zmw:43085.2.99999', 'Columbus, Ohio');
 
   locationInput.keyup(function() {
     var query = locationInput.val();
@@ -23,16 +22,7 @@ $(function() {
         
         success: function(data) {
           var locations = data.RESULTS;
-          var items = [];
-          $('#results').empty();
-          $.each(locations, function(index, location) {
-            console.log(index, location.name);
-            items.push('<li data-location="' + location.l + '">' + location.name + '</li>');
-          });
-          $('<ul/>', {
-            'class': 'location-list',
-            html: items.join('')
-          }).appendTo('#results');
+          showCities(locations);
         },
 
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -42,31 +32,55 @@ $(function() {
     }  
   });
 
-  //jQuery ajax request for the weather data.
-  $.ajax({
-    url: weatherRequest,
+  function showCities(locations) {
+    var items = [];
+    $('#results').empty();
+    $.each(locations, function(index, location) {
+      items.push('<li data-location="' + location.l + '">' + location.name + '</li>');
+    });
+    $('<ul/>', {
+      'class': 'location-list',
+      html: items.join('')
+    }).appendTo('#results');
+  };
 
-      dataType: 'jsonp',
+  function getWeatherData(location, locationText) {
+    var weatherRequest = wuPrefix + wuApiKey + '/hourly/forecast/almanac/' + location + '.json';
 
-      success: function( response ) {
-        makeGraph(response.hourly_forecast, response.almanac, response.forecast);
-      }
+    //jQuery ajax request for the weather data.
+    $.ajax({
+      url: weatherRequest,
+
+        dataType: 'jsonp',
+
+        success: function( response ) {
+          makeGraph(response.hourly_forecast, response.almanac, response.forecast, locationText);
+        }
+    });
+  }
+
+  $('body').on('click', '.location-list li', function() {
+    var location = $(this).data('location');
+    var locationText = $(this).text();
+    $('#results').empty();
+    $('#graph').empty();
+    locationInput.val('');
+    getWeatherData(location, locationText);
   });
 
-  //Set up the svg on the page without waiting for data
-  var margin = {top: 75, right: 75, bottom: 75, left: 100};
-  var height = 500 - margin.top - margin.bottom;
-  var width = 800 - margin.left - margin.right;
-
-  var svgSelection = d3.select('#graph')
-    .append('svg')
-    .attr('height', height + margin.top + margin.bottom)
-    .attr('width', width + margin.left + margin.right)
-    .append('g')
-    .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
-
   //makeGraph function is called from success function of ajax call.
-  function makeGraph(hourlyDataArray, historicalData, forecastDataArray) {
+  function makeGraph(hourlyDataArray, historicalData, forecastDataArray, locationText) {
+    var margin = {top: 75, right: 75, bottom: 75, left: 100};
+    var height = 500 - margin.top - margin.bottom;
+    var width = 800 - margin.left - margin.right;
+
+    var svgSelection = d3.select('#graph')
+      .append('svg')
+      .attr('height', height + margin.top + margin.bottom)
+      .attr('width', width + margin.left + margin.right)
+      .append('g')
+      .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
     var parseDate = d3.time.format('%H %d %m %Y').parse;
     var dateFormat = d3.time.format('%I %p');
 
@@ -194,7 +208,7 @@ $(function() {
       .attr('x', (width/2))
       .attr('y', 0 - (margin.top/2))
       .attr('text-anchor', 'middle')
-      .text(city + ', ' + state + ' hourly temperature');
+      .text(locationText + ' hourly temperature');
 
     svgSelection.append('text')
       .attr('class', 'label')
