@@ -4,17 +4,26 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <meta >
   <title>Weather Graph</title>
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
+  
   <div class="wrapper">
     <div class="row">
-      <div class="col col-80 centered">
+      <div class="col col-70">
         <div id="graph"></div>
       </div>
+      <div class="col col-30">
+        <form name="location-input">
+          <input type="text"
+                 name="location"
+                 id="location-input"
+                 placeholder="Type a city"
+                 autocomplete="off">
+          <div id="results"></div>
+        </form>
+      </div> 
     </div>
   </div>
  

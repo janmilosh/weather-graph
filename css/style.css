@@ -1,9 +1,8 @@
 body {
   margin: 0;
-  padding: 0;
-  background: #222;
-  background: url('../images/dark_brick_wall.png');
-  color: green;
+  padding: 50px 0 0;
+  background: #f1f1f1;
+  color: #555;
 }
 
 .clearfix:before,
@@ -24,20 +23,45 @@ html {
   box-sizing: inherit;
 }
 
+ul {
+  list-style-type: none;
+  font-family: helvetica, sans-serif;
+  padding-left: 0;
+  margin-top: 0px;
+}
+
+ul li {
+  font-size: 16px;
+  line-height: 1.4;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  padding: 5px 10px 3px;
+}
+
+ul li:first-child {
+  border-top: 1px solid #ccc;
+}
+
+ul li:nth-child(odd) {
+  background: #f8f8f8;
+}
+
 .wrapper {
-  width: 1000px;
+  width: 1158px;
   margin: 0 auto;
   max-width: 100%;
 }
 
 .row {
-  margin: 0 -10px;
+  margin: 0 -15px;
 }
 
 .col {
   float: left;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .col-10 { width: 10%; }
@@ -61,15 +85,43 @@ h1, h2, h3 {
   margin: 0 0 20px;
 }
 
-#graph {
-  margin-top: 50px;
+input {
+  width: 100%;
 }
 
+input[type="text"] {
+  height: 32px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding-left: 8px;
+  margin-bottom: 0;
+  color: #444;
+
+}
+
+input[type="submit"] {
+  height: 32px;
+  font-size: 18px;
+  background: #5A78BB;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
 
 svg {
   box-shadow: 0 0 6px rgba(0,0,0,0.2);
   margin-bottom: 30px;
-  background: #1b1b1b;
+  background: #fff;
+}
+
+.record-rect {
+  fill: #D3D5E5;
+}
+
+.normal-rect {
+  fill: #9CA3D9;
+  opacity: 0.5;
 }
 
 .axis path, .axis line {
@@ -82,7 +134,7 @@ svg {
 text.title,
 text.label {
   font-family: helvetica;
-  fill: #A9C3F3;
+  fill: #5A78BB;
 }
 
 .title {
@@ -101,6 +153,6 @@ text.label {
 
 .line {
   fill: none;
-  stroke: #00FF21;
+  stroke: #000AB2;
   stroke-width: 1.5px;
 }
