@@ -64,7 +64,7 @@ $(function() {
     var locationText = $(this).text();
     $('#results').empty();
     $('#graph').empty();
-    locationInput.val('');
+    locationInput.val(null);
     getWeatherData(location, locationText);
   });
 
