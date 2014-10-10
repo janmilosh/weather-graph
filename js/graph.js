@@ -54,7 +54,11 @@ $(function() {
         dataType: 'jsonp',
 
         success: function( response ) {
-          makeGraph(response.hourly_forecast, response.almanac, response.forecast, locationText);
+          makeGraph(response, locationText);
+        },
+
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+             console.log(textStatus, errorThrown);
         }
     });
   }
@@ -69,7 +73,8 @@ $(function() {
   });
 
   //makeGraph function is called from success function of ajax call.
-  function makeGraph(hourlyDataArray, historicalData, forecastDataArray, locationText) {
+  function makeGraph(response, locationText) {
+
     var margin = {top: 75, right: 75, bottom: 75, left: 100};
     var height = 500 - margin.top - margin.bottom;
     var width = 800 - margin.left - margin.right;
@@ -81,48 +86,65 @@ $(function() {
       .append('g')
       .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-    var parseDate = d3.time.format('%H %d %m %Y').parse;
-    var dateFormat = d3.time.format('%I %p');
+    //Process data inside a try/catch block
+    try {
 
-    //Historical data from almanac, parse temperatures as integers
-    var high = historicalData.temp_high;
-    var low = historicalData.temp_low;
-    
-    var normalHigh = parseInt(high.normal.F, 10);
-    var recordHigh = parseInt(high.record.F, 10);
-    var normalLow = parseInt(low.normal.F, 10);
-    var recordLow = parseInt(low.record.F, 10);
-    console.log([recordHigh, recordLow, normalHigh, normalLow]);
+      var parseDate = d3.time.format('%H %d %m %Y').parse;
+      var dateFormat = d3.time.format('%I %p');
 
-    //Puts the dates in the proper format
-    hourlyDataArray.forEach(function(item) {
-      var timeBase = item.FCTTIME;
+      //Historical data from almanac, parse temperatures as integers
+      var high = response.almanac.temp_high;
+      var low = response.almanac.temp_low;
+      
+      var normalHigh = parseInt(high.normal.F, 10);
+      var recordHigh = parseInt(high.record.F, 10);
+      var normalLow = parseInt(low.normal.F, 10);
+      var recordLow = parseInt(low.record.F, 10);
+      var recordHighYear = high.recordyear;
+      var recordLowYear = low.recordyear;
 
-      var hour = timeBase.hour_padded;
-      var day = timeBase.mday_padded;
-      var month = timeBase.mon_padded;
-      var year = timeBase.year;
+      //Puts the dates in the proper format
+      var hourlyDataArray = response.hourly_forecast;
+      hourlyDataArray.forEach(function(item) {
+        var timeBase = item.FCTTIME;
 
-      var date = [hour, day, month, year].join(' ');
-      item.time = parseDate(date);
+        var hour = timeBase.hour_padded;
+        var day = timeBase.mday_padded;
+        var month = timeBase.mon_padded;
+        var year = timeBase.year;
 
-      item.temp = parseInt(item.temp.english, 10);
-    });
+        var date = [hour, day, month, year].join(' ');
+        item.time = parseDate(date);
 
-    var startDateBase = hourlyDataArray[0].FCTTIME;
-    var endDateBase = hourlyDataArray[35].FCTTIME;
-    var startDate = startDateBase.mon_abbrev + ' ' + startDateBase.mday;
-    var endDate = endDateBase.mon_abbrev + ' ' + endDateBase.mday;
-    var endYear = endDateBase.year;
-    
-    var xRange = d3.extent(hourlyDataArray, function(d) { return d.time; });
+        item.temp = parseInt(item.temp.english, 10);
+      });
 
-    //We need to find max and min temps for the hourly and the historical data.
-    //First find max and min for hourly, then put values in array and find overall range.
-    var hourlyMax = d3.max(hourlyDataArray, function(d) { return d.temp });
-    var hourlyMin = d3.min(hourlyDataArray, function(d) { return d.temp });
-    var tempMaxMinArray = [hourlyMax, hourlyMin, recordHigh, normalHigh, recordLow, normalLow];
-    var yRange = d3.extent(tempMaxMinArray, function(d) { return d });
+      var startDateBase = hourlyDataArray[0].FCTTIME;
+      var endDateBase = hourlyDataArray[35].FCTTIME;
+      var startDate = startDateBase.mon_abbrev + ' ' + startDateBase.mday;
+      var endDate = endDateBase.mon_abbrev + ' ' + endDateBase.mday;
+      var endYear = endDateBase.year;
+      
+      var xRange = d3.extent(hourlyDataArray, function(d) { return d.time; });
+
+      //We need to find max and min temps for the hourly and the historical data.
+      //First find max and min for hourly, then put values in array and find overall range.
+      var hourlyMax = d3.max(hourlyDataArray, function(d) { return d.temp });
+      var hourlyMin = d3.min(hourlyDataArray, function(d) { return d.temp });
+      var tempMaxMinArray = [hourlyMax, hourlyMin, recordHigh, normalHigh, recordLow, normalLow];
+      var yRange = d3.extent(tempMaxMinArray, function(d) { return d });
+
+    } catch(e) {
+      //If there's a problem with the data, log out the error and print a message
+      console.log(e);
+
+      svgSelection.append('text')
+        .attr('class', 'title')
+        .attr('x', (width/2 - 13))
+        .attr('y', (height/2))
+        .attr('text-anchor', 'middle')
+        .text('There is no data for this location. Please try another.');
+    }
 
     if (yRange[0] > 0) {
       yRange[0] = 0;
@@ -137,15 +159,43 @@ $(function() {
       .domain(yRange).nice() 
       .range([height, 0]);
 
-    //Bound the record high and record low by a rectangle
-    svgSelection.append('rect')
-      .attr('x', 0)
-      .attr('y', yScale(recordHigh))
-      .attr('height', yScale(recordLow)-yScale(recordHigh))
-      .attr('width', width)
-      .attr('class', 'record-rect');
+    //Add line for the record high
+    svgSelection.append('line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y2', yScale(recordHigh))
+      .attr('y1', yScale(recordHigh))
+      .style('stroke-dasharray', ('3, 3'))
+      .attr('class', 'record-line');
 
-    //Bound the normal high and normal low by a rectangle
+    //Add line for the record low
+    svgSelection.append('line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y2', yScale(recordLow))
+      .attr('y1', yScale(recordLow))
+      .style('stroke-dasharray', ('3, 3'))
+      .attr('class', 'record-line');
+
+    //Add text for record high
+    svgSelection.append('text')
+      .attr('class', 'record-text')
+      .attr('x', width)
+      .attr('y', yScale(recordHigh))
+      .attr('text-anchor', 'end')
+      .attr('dy', '-8')  
+      .text('Record high in ' + recordHighYear);
+
+    //Add text for record low
+    svgSelection.append('text')
+      .attr('class', 'record-text')
+      .attr('x', width)
+      .attr('y', yScale(recordLow))
+      .attr('text-anchor', 'end')
+      .attr('dy', '18')  
+      .text('Record low in ' + recordLowYear);
+
+    //Bound the normal temps by a rectangle
     svgSelection.append('rect')
       .attr('x', 0)
       .attr('y', yScale(normalHigh))
@@ -153,23 +203,43 @@ $(function() {
       .attr('width', width)
       .attr('class', 'normal-rect');
 
-    svgSelection.append('text')
-      .attr('class', 'label')
-      .attr('x', width)
-      .attr('y', yScale(recordHigh))
-      .attr('dy', '22')
-      .attr('dx', '-12')
-      .attr('text-anchor', 'end')  
-      .text('record');
+    //Add line for the normal high
+    svgSelection.append('line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y2', yScale(normalHigh))
+      .attr('y1', yScale(normalHigh))
+      .style('stroke-dasharray', ('3, 3'))
+      .attr('class', 'normal-line');
 
+    //Add line for the normal low
+    svgSelection.append('line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y2', yScale(normalLow))
+      .attr('y1', yScale(normalLow))
+      .style('stroke-dasharray', ('3, 3'))
+      .attr('class', 'normal-line');
+
+    //Add text for normal high
     svgSelection.append('text')
-      .attr('class', 'label')
-      .attr('x', width)
+      .attr('class', 'normal-text')
+      .attr('x', 0)
       .attr('y', yScale(normalHigh))
-      .attr('dy', '22')
-      .attr('dx', '-12')
-      .attr('text-anchor', 'end')  
-      .text('normal');
+      .attr('text-anchor', 'left')
+      .attr('dy', '-8')
+      .attr('dx', '8')
+      .text('Normal high');
+
+    //Add text for normal low
+    svgSelection.append('text')
+      .attr('class', 'normal-text')
+      .attr('x', 0)
+      .attr('y', yScale(normalLow))
+      .attr('text-anchor', 'left')
+      .attr('dy', '18')
+      .attr('dx', '8') 
+      .text('Normal low');
 
     //Define and add hourly temperature as a line 
     var line = d3.svg.line()
@@ -182,6 +252,7 @@ $(function() {
       .attr('class', 'line')
       .attr('d', line);
 
+    //Add x and y axis
     var xAxis = d3.svg.axis()
       .scale(xScale)
       .orient('bottom')
@@ -203,20 +274,13 @@ $(function() {
       .attr('class', 'axis')
       .call(yAxis);
 
+    //Add title and label text
     svgSelection.append('text')
       .attr('class', 'title')
       .attr('x', (width/2))
       .attr('y', 0 - (margin.top/2))
       .attr('text-anchor', 'middle')
-      .text(locationText + ' hourly temperature');
-
-    svgSelection.append('text')
-      .attr('class', 'label')
-      .attr('x', (width/2))
-      .attr('y', height + margin.bottom/2)
-      .attr('dy', '16')
-      .attr('text-anchor', 'middle')  
-      .text('Time');
+      .text(locationText + ' Hourly Forecast');
 
     svgSelection.append('text')
       .attr('class', 'label')
@@ -233,6 +297,14 @@ $(function() {
       .attr('dy', '16')
       .attr('text-anchor', 'end')  
       .text(endDate);
+
+    svgSelection.append('text')
+      .attr('class', 'label')
+      .attr('x', width/2)
+      .attr('y', height + margin.bottom/2)
+      .attr('dy', '16')
+      .attr('text-anchor', 'middle')  
+      .text(locationText + ' Local Time');
 
     svgSelection.append('text')
       .attr('class', 'label')

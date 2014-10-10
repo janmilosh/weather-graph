@@ -3,6 +3,7 @@ body {
   padding: 30px 0 0;
   background: #f1f1f1;
   color: #555;
+  font-family: helvetica, sans-serif;
 }
 
 .clearfix:before,
@@ -28,11 +29,18 @@ h1, h2, h3 {
   font-family: helvetica, sans-serif;
   font-weight: 300;
   margin: 0 0 30px;
-  color: #18409A;
+  color: #5A78BB;
 }
 
 h1 {
   font-size: 28px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 18px;
+  color: #5A78BB;
 }
 
 .placeholder {
@@ -127,13 +135,26 @@ svg {
   background: #fff;
 }
 
-.record-rect {
-  fill: #D3D5E5;
+.record-line {
+  stroke: #D65511;
+  stroke-width: 2px;
+}
+
+.record-text {
+  fill: #D65511;
+}
+
+.normal-line {
+  stroke: #54E054;
+  stroke-width: 2px;
+}
+
+.normal-text {
+  fill: #54E054;
 }
 
 .normal-rect {
-  fill: #9CA3D9;
-  opacity: 0.5;
+  fill: #f4f4f4;
 }
 
 .axis path, .axis line {
@@ -165,6 +186,6 @@ text.label {
 
 .line {
   fill: none;
-  stroke: #000AB2;
-  stroke-width: 1.5px;
+  stroke: #5A78BB;
+  stroke-width: 3px;
 }
