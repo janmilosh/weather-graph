@@ -86,7 +86,6 @@ $(function() {
           '</tr>' +
         '</thead>' +
       '<tbody>');
-    console.log('the items', items);
     $.each(forecastData, function(index, data) {
       items.push(
         '<tr>' +
@@ -106,7 +105,7 @@ $(function() {
   //makeGraph function is called from success function of ajax call.
   function makeGraph(response, locationText) {
 
-    var margin = {top: 75, right: 75, bottom: 75, left: 100};
+    var margin = {top: 70, right: 45, bottom: 75, left: 75};
     var height = 500 - margin.top - margin.bottom;
     var width = 800 - margin.left - margin.right;
 
@@ -117,7 +116,7 @@ $(function() {
       .append('g')
       .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-    //Process data inside a try/catch block
+    //Process graph data inside a try/catch block in case there isn't any
     try {
 
       var parseDate = d3.time.format('%H %d %m %Y').parse;
@@ -342,7 +341,7 @@ $(function() {
       .attr('transform', 'rotate(-90)')
       .attr('y', 0 - margin.left/2)
       .attr('x', 0 - height/2)
-      .attr('dy', '-20')
+      .attr('dy', '-6')
       .attr('text-anchor', 'middle')  
       .html('Temperature &deg;F');
 

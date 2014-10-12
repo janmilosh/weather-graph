@@ -74,13 +74,15 @@ ul li:nth-child(odd) {
 }
 
 .wrapper {
-  width: 1158px;
+  width: 1188px;
   margin: 0 auto;
   max-width: 100%;
+  padding: 0 15px;
 }
 
 .row {
   margin: 0 -15px;
+  position: relative;
 }
 
 .col {
@@ -104,6 +106,22 @@ ul li:nth-child(odd) {
   float: none;
   margin-left: auto;
   margin-right: auto;
+}
+
+.graph {
+  width: 832px;
+  padding: 0 15px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.sidebar {
+  width: 356px;
+  padding: 0 15px;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 input {
