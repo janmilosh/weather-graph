@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding: 30px 0 0;
+  padding: 30px 0;
   background: #f1f1f1;
   color: #555;
   font-family: helvetica, sans-serif;
@@ -40,7 +40,8 @@ label {
   display: block;
   margin-bottom: 5px;
   font-size: 18px;
-  color: #5A78BB;
+  color: white;
+  font-weight: 300;
 }
 
 .placeholder {
@@ -127,6 +128,46 @@ input[type="submit"] {
   color: white;
   border: none;
   border-radius: 5px;
+}
+
+#location-results {
+  position: absolute;
+  min-width: 26%;
+}
+
+table {
+  margin: 20px 0 30px;
+  background: white;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+form {
+  background: #5A78BB;
+  padding: 15px;
+}
+
+td:first-child {
+  border-right: none;
+  vertical-align: top;
+  padding: 5px 5px 2px;
+}
+
+td:last-child {
+  border-left: none;
+  padding: 5px;
+}
+
+td h3 {
+  margin: 0;
+}
+
+.icon {
+  text-align: center;
 }
 
 svg {

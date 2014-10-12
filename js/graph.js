@@ -8,11 +8,11 @@ $(function() {
   locationInput.keyup(function() {
     var query = locationInput.val();
     var cityRequest = 'http://autocomplete.wunderground.com/aq?query=' + query;
-    if (query < 1) {
-      $('#results').empty();
+    if (query.length < 2) {
+      $('#location-results').empty();
     } else {
     
-      //jQuery ajax request for the location data, but only if there are at least 3 characters.
+      //jQuery ajax request for the location data.
       
       $.ajax({
         url: cityRequest,
@@ -34,15 +34,24 @@ $(function() {
 
   function showCities(locations) {
     var items = [];
-    $('#results').empty();
+    $('#location-results').empty();
     $.each(locations, function(index, location) {
       items.push('<li data-location="' + location.l + '">' + location.name + '</li>');
     });
     $('<ul/>', {
       'class': 'location-list',
       html: items.join('')
-    }).appendTo('#results');
+    }).appendTo('#location-results');
   };
+
+  $('body').on('click', '.location-list li', function() {
+    var location = $(this).data('location');
+    var locationText = $(this).text();
+    $('#location-results').empty();
+    $('#graph').empty();
+    locationInput.val(null);
+    getWeatherData(location, locationText);
+  });
 
   function getWeatherData(location, locationText) {
     var weatherRequest = wuPrefix + wuApiKey + '/hourly/forecast/almanac/' + location + '.json';
@@ -54,6 +63,7 @@ $(function() {
         dataType: 'jsonp',
 
         success: function( response ) {
+          showThreeDayForecast(response.forecast.txt_forecast.forecastday, locationText);
           makeGraph(response, locationText);
         },
 
@@ -63,14 +73,35 @@ $(function() {
     });
   }
 
-  $('body').on('click', '.location-list li', function() {
-    var location = $(this).data('location');
-    var locationText = $(this).text();
-    $('#results').empty();
-    $('#graph').empty();
-    locationInput.val(null);
-    getWeatherData(location, locationText);
-  });
+  function showThreeDayForecast(forecastData, locationText) {
+    var items = [];
+    $('#three-day-weather').empty();
+    $('#location-results').empty();
+    items.push(
+        '<thead>' +
+          '<tr>' +
+            '<td colspan="2">' +
+              '<h3>' + locationText + ' Forecast</h3>' +
+            '</td>' +
+          '</tr>' +
+        '</thead>' +
+      '<tbody>');
+    console.log('the items', items);
+    $.each(forecastData, function(index, data) {
+      items.push(
+        '<tr>' +
+          '<td class="icon">' +
+            '<img src="http://icons.wxug.com/i/c/c/' + data.icon + '.gif">' +
+          '</td>' +
+          '<td class="text-forecast">' +
+            '<strong>' + data.title + ':</strong> ' + data.fcttext +
+          '</td>' +
+        '</tr>');
+      });
+    items.push('</tbody>')
+    var tableString = items.join('');
+    $('#three-day-weather').append(tableString);
+  };
 
   //makeGraph function is called from success function of ajax call.
   function makeGraph(response, locationText) {
