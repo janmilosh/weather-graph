@@ -187,7 +187,7 @@ $(function() {
         .attr('x', (width/2 - 13))
         .attr('y', (height/2))
         .attr('text-anchor', 'middle')
-        .text('There is no data for this location. Please try another.');
+        .text('There is no hourly data for this location. Please try another.');
     }
 
     if (yRange[0] > 0) {

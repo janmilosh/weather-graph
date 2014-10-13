@@ -161,6 +161,7 @@ table, th, td {
 form {
   background: #5A78BB;
   padding: 15px;
+  max-width: 326px;
 }
 
 td:first-child {
@@ -250,6 +251,7 @@ text.label {
     margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
+    
   }
 }
 
@@ -259,7 +261,4 @@ text.label {
     width: 100%;
   }
 
-  .location-results {
-    width: 100%;
-  }
 }
