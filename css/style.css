@@ -82,7 +82,6 @@ ul li:nth-child(odd) {
 
 .row {
   margin: 0 -15px;
-  position: relative;
 }
 
 .col {
@@ -109,19 +108,14 @@ ul li:nth-child(odd) {
 }
 
 .graph {
-  width: 832px;
   padding: 0 15px;
-  position: absolute;
-  left: 0;
-  top: 0;
+  float: left;
 }
 
 .sidebar {
   width: 356px;
   padding: 0 15px;
-  position: absolute;
-  right: 0;
-  top: 0;
+  float: right;
 }
 
 input {
@@ -150,7 +144,7 @@ input[type="submit"] {
 
 #location-results {
   position: absolute;
-  min-width: 26%;
+  width: 296px;
 }
 
 table {
@@ -247,4 +241,25 @@ text.label {
   fill: none;
   stroke: #5A78BB;
   stroke-width: 3px;
+}
+
+@media (max-width: 1024px) {
+  
+  .sidebar {
+    float: none;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 800px) {
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .location-results {
+    width: 100%;
+  }
 }

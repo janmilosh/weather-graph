@@ -3,6 +3,17 @@ $(function() {
   var wuPrefix = 'http://api.wunderground.com/api/';
   var locationInput = $('#location-input');
 
+  var windowWidth = $(window).width();
+  var wrapperWidth = $('.wrapper').width();
+  var sidebarWidth = $('.sidebar').width();
+  if (windowWidth >= 1024) {
+    var svgWidth = wrapperWidth - sidebarWidth - 30;
+  } else {
+    var svgWidth = wrapperWidth;
+  }
+
+  var svgHeight = svgWidth * 5/8;
+
   getWeatherData('/q/zmw:43085.2.99999', 'Columbus, Ohio');
 
   locationInput.keyup(function() {
@@ -64,7 +75,10 @@ $(function() {
 
         success: function( response ) {
           showThreeDayForecast(response.forecast.txt_forecast.forecastday, locationText);
-          makeGraph(response, locationText);
+          
+          if (windowWidth > 600) {
+            makeGraph(response, locationText);
+          }
         },
 
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -106,13 +120,13 @@ $(function() {
   function makeGraph(response, locationText) {
 
     var margin = {top: 70, right: 45, bottom: 75, left: 75};
-    var height = 500 - margin.top - margin.bottom;
-    var width = 800 - margin.left - margin.right;
+    var height = svgHeight - margin.top - margin.bottom;
+    var width = svgWidth - margin.left - margin.right;
 
     var svgSelection = d3.select('#graph')
       .append('svg')
-      .attr('height', height + margin.top + margin.bottom)
-      .attr('width', width + margin.left + margin.right)
+      .attr('height', svgHeight)
+      .attr('width', svgWidth)
       .append('g')
       .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
