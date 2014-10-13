@@ -243,7 +243,7 @@ text.label {
   stroke-width: 3px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
   
   .sidebar {
     float: none;

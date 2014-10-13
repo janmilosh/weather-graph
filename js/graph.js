@@ -357,7 +357,6 @@ $(function() {
       .attr('x', 0 - height/2)
       .attr('dy', '-6')
       .attr('text-anchor', 'middle')  
-      .html('Temperature &deg;F');
-
+      .text('Temperature °F');
   };
 });
