@@ -33,7 +33,7 @@ h1, h2, h3 {
 }
 
 h1 {
-  font-size: 28px;
+  font-size: 26px;
 }
 
 label {
@@ -107,6 +107,10 @@ ul li:nth-child(odd) {
   margin-right: auto;
 }
 
+.visible-xs {
+  display: none;
+}
+
 .graph {
   padding: 0 15px;
   float: left;
@@ -160,7 +164,7 @@ table, th, td {
 
 form {
   background: #5A78BB;
-  padding: 15px;
+  padding: 10px 15px 15px;
   max-width: 326px;
 }
 
@@ -255,7 +259,15 @@ text.label {
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 600px) {
+
+  body {
+    padding-top: 0;
+  }
+
+  .visible-xs {
+    display: block;
+  }
 
   .sidebar {
     width: 100%;
