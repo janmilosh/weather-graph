@@ -259,6 +259,14 @@ text.label {
   }
 }
 
+@media (max-width: 800px) {
+
+  .sidebar {
+    width: 100%;
+  }
+
+}
+
 @media (max-width: 600px) {
 
   body {
@@ -267,10 +275,6 @@ text.label {
 
   .visible-xs {
     display: block;
-  }
-
-  .sidebar {
-    width: 100%;
   }
 
 }
