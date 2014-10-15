@@ -59,7 +59,7 @@ $(function() {
     var location = $(this).data('location');
     var locationText = $(this).text();
     $('#location-results').empty();
-    $('#graph').empty();
+    $('svg').empty();
     locationInput.val(null);
     getWeatherData(location, locationText);
   });
@@ -75,7 +75,7 @@ $(function() {
 
         success: function( response ) {
           showThreeDayForecast(response.forecast.txt_forecast.forecastday, locationText);
-          
+          showSimpleForecast(response.forecast.simpleforecast.forecastday)
           if (windowWidth > 600) {
             makeGraph(response, locationText);
           }
@@ -114,7 +114,26 @@ $(function() {
     items.push('</tbody>')
     var tableString = items.join('');
     $('#three-day-weather').append(tableString);
-  };
+  }
+
+  function showSimpleForecast(forecastData) {
+    console.log(forecastData);
+    var items = [];
+    $('#simple-forecast').empty();
+    $.each(forecastData, function(index, data) {
+      items.push(
+        '<div class="simple">' +
+          '<div class="panel">' +
+            '<h3>' + data.date.weekday + '</h3>' +
+            '<h2>' + data.high.fahrenheit + '/' + data.low.fahrenheit + ' °F</h2>' +
+            '<h4>' + data.conditions + '</h4>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+    var divString = items.join('');
+    $('#simple-forecast').append(divString);
+  }
 
   //makeGraph function is called from success function of ajax call.
   function makeGraph(response, locationText) {
@@ -123,8 +142,7 @@ $(function() {
     var height = svgHeight - margin.top - margin.bottom;
     var width = svgWidth - margin.left - margin.right;
 
-    var svgSelection = d3.select('#graph')
-      .append('svg')
+    var svgSelection = d3.select('svg')
       .attr('height', svgHeight)
       .attr('width', svgWidth)
       .append('g')
@@ -358,5 +376,5 @@ $(function() {
       .attr('dy', '-6')
       .attr('text-anchor', 'middle')  
       .text('Temperature °F');
-  };
+  }
 });
