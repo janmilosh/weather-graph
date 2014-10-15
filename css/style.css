@@ -125,6 +125,7 @@ ul li:nth-child(odd) {
 
 .graph {
   padding: 0 15px;
+  max-width: 832px;
   float: left;
 }
 
