@@ -1,18 +1,25 @@
 $(function() {
+  var windowWidth, wrapperWidth, sidebarWidth, svgWidth, svgHeight;
   var wuApiKey = 'e7abc77487d7e3eb';
   var wuPrefix = 'http://api.wunderground.com/api/';
   var locationInput = $('#location-input');
 
-  var windowWidth = $(window).width();
-  var wrapperWidth = $('.wrapper').width();
-  var sidebarWidth = $('.sidebar').width();
-  if (windowWidth >= 1024) {
-    var svgWidth = wrapperWidth - sidebarWidth - 30;
-  } else {
-    var svgWidth = wrapperWidth;
+  function setSizes() {
+    windowWidth = $(window).width();
+    wrapperWidth = $('.wrapper').width();
+    sidebarWidth = $('.sidebar').width();
+    if (windowWidth >= 1024) {
+      svgWidth = wrapperWidth - sidebarWidth - 30;
+    } else {
+      svgWidth = wrapperWidth;
+    }
+    svgHeight = svgWidth * 5/8;
   }
 
-  var svgHeight = svgWidth * 5/8;
+  setSizes();
+  $(window).resize(function() {
+    setSizes();
+  });
 
   getWeatherData('/q/zmw:43085.2.99999', 'Columbus, Ohio');
 
@@ -37,7 +44,7 @@ $(function() {
         },
 
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-             console.log(textStatus, errorThrown);
+          console.log(textStatus, errorThrown);
         }
       });
     }  
@@ -65,7 +72,7 @@ $(function() {
   });
 
   function getWeatherData(location, locationText) {
-    var weatherRequest = wuPrefix + wuApiKey + '/hourly/forecast/almanac/' + location + '.json';
+    var weatherRequest = wuPrefix + wuApiKey + '/hourly/forecast/almanac' + location + '.json';
 
     //jQuery ajax request for the weather data.
     $.ajax({
@@ -82,7 +89,7 @@ $(function() {
         },
 
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-             console.log(textStatus, errorThrown);
+          console.log(textStatus, errorThrown);
         }
     });
   }
@@ -117,7 +124,6 @@ $(function() {
   }
 
   function showSimpleForecast(forecastData) {
-    console.log(forecastData);
     var items = [];
     $('#simple-forecast').empty();
     $.each(forecastData, function(index, data) {
