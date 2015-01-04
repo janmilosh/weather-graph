@@ -201,6 +201,9 @@ $(function() {
       var hourlyMin = d3.min(hourlyDataArray, function(d) { return d.temp });
       var tempMaxMinArray = [hourlyMax, hourlyMin, recordHigh, normalHigh, recordLow, normalLow];
       var yRange = d3.extent(tempMaxMinArray, function(d) { return d });
+      //extend the range a bit to accommodate text labels on the record high/low lines
+      yRange[0] -= 8;
+      yRange[1] += 8;
 
     } catch(e) {
       //If there's a problem with the data, log out the error and print a message
