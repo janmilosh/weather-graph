@@ -36,6 +36,10 @@ h1 {
   font-size: 26px;
 }
 
+.hourly-wrapper h1 {
+  margin-top: 40px;
+}
+
 label {
   display: block;
   margin-bottom: 5px;
@@ -179,6 +183,23 @@ table, th, td {
   font-size: 14px;
 }
 
+.hourly-wrapper table {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 30px;
+}
+
+.hourly-wrapper tr:nth-child(even) {
+  background: #f4f4f4;
+}
+
+.hourly-wrapper td {
+  padding: 4px 10px;
+  border: 1px solid #5A78BB;
+  font-size: 1.2em;
+  color: #5A78BB;
+}
+
 #simple-forecast {
   margin-bottom: 20px;
 }
@@ -216,7 +237,7 @@ svg {
 
 .record-line {
   stroke: #D65511;
-  stroke-width: 2px;
+  stroke-width: 1px;
 }
 
 .record-text {
@@ -224,12 +245,12 @@ svg {
 }
 
 .normal-line {
-  stroke: #54E054;
-  stroke-width: 2px;
+  stroke: #5A78BB;
+  stroke-width: 1px;
 }
 
 .normal-text {
-  fill: #54E054;
+  fill: #5A78BB;
 }
 
 .normal-rect {
@@ -269,6 +290,15 @@ text.label {
   stroke-width: 3px;
 }
 
+.footer p {
+  text-align: center;
+}
+
+.footer p span {
+  position: relative;
+  top: -8px;
+}
+
 @media (max-width: 1023px) {
   
   .sidebar {
@@ -298,7 +328,8 @@ text.label {
     display: block;
   }
 
-  svg {
+  svg,
+  #graph {
     display: none;
   }
 

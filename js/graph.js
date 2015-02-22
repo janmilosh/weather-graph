@@ -83,6 +83,7 @@ $(function() {
         success: function( response ) {
           showThreeDayForecast(response.forecast.txt_forecast.forecastday, locationText);
           showSimpleForecast(response.forecast.simpleforecast.forecastday)
+          showHourlyForecast(response.hourly_forecast, locationText)
           if (windowWidth > 600) {
             makeGraph(response, locationText);
           }
@@ -139,6 +140,32 @@ $(function() {
     });
     var divString = items.join('');
     $('#simple-forecast').append(divString);
+  }
+
+  function showHourlyForecast(forecastData, locationText) {
+    var items = [];
+    console.log(locationText);
+    console.log(forecastData);
+    $('.hourly-wrapper h1').html(locationText + ' &ndash; ' + forecastData[0].FCTTIME.pretty)
+    $('#hourly-forecast').empty();
+    $.each(forecastData, function(index, data) {
+      if(data.snow.english > 0 ) {
+        data.snowString = ', ' + data.snow.english + ' inches';
+      } else {
+        data.snowString = '';
+      }
+      items.push(
+        '<tr>' +
+          '<td class="text-right">' + data.FCTTIME.civil + '</td>' +
+          '<td class="text-right">' + data.temp.english + ' &deg;F</td>' +
+          '<td>' + data.condition + data.snowString + '</td>' +
+          '<td>' + data.humidity + '% humidity, wind: ' + data.wspd.english + ' mph/' + data.wdir.dir + '</td>' +
+          '<td>' + data.pop + '% chance of precipitation</td>' +
+        '</tr>'
+      );
+    });
+    var divString = items.join('');
+    $('#hourly-forecast').append(divString);
   }
 
   //makeGraph function is called from success function of ajax call.
@@ -236,7 +263,7 @@ $(function() {
       .attr('x2', width)
       .attr('y2', yScale(recordHigh))
       .attr('y1', yScale(recordHigh))
-      .style('stroke-dasharray', ('3, 3'))
+      .style('stroke-dasharray', ('8, 1'))
       .attr('class', 'record-line');
 
     //Add line for the record low
@@ -245,7 +272,7 @@ $(function() {
       .attr('x2', width)
       .attr('y2', yScale(recordLow))
       .attr('y1', yScale(recordLow))
-      .style('stroke-dasharray', ('3, 3'))
+      .style('stroke-dasharray', ('8, 1'))
       .attr('class', 'record-line');
 
     //Add text for record high
@@ -280,7 +307,7 @@ $(function() {
       .attr('x2', width)
       .attr('y2', yScale(normalHigh))
       .attr('y1', yScale(normalHigh))
-      .style('stroke-dasharray', ('3, 3'))
+      .style('stroke-dasharray', ('8, 1'))
       .attr('class', 'normal-line');
 
     //Add line for the normal low
@@ -289,7 +316,7 @@ $(function() {
       .attr('x2', width)
       .attr('y2', yScale(normalLow))
       .attr('y1', yScale(normalLow))
-      .style('stroke-dasharray', ('3, 3'))
+      .style('stroke-dasharray', ('8, 1'))
       .attr('class', 'normal-line');
 
     //Add text for normal high
