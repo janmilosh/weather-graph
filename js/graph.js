@@ -6,6 +6,8 @@ $(function() {
   var timezone;
   var response;
   var locationText;
+  var locationElement = $('.header h1.location');
+  var dateElement = $('.header h1.time');
 
   function setSizes() {
     windowWidth = $(window).width();
@@ -113,7 +115,6 @@ $(function() {
     showSimpleForecast(response.forecast.simpleforecast.forecastday)
     showHourlyForecast(response.hourly_forecast)
     timezone = response.forecast.simpleforecast.forecastday[0].date.tz_long;
-    
     $('.header h1.location').html('Weather for ' + locationText);
     updateTime();
     if (windowWidth > 600) {
@@ -121,16 +122,27 @@ $(function() {
     }
   }
 
-  //The Time function for the header clock
+  //The Time function for the header clock (currently only works in Chrome)
+  //This will require refactoring to work in Safari and Firefox
   var date = {};
-  var dateElement = $('.header h1.time');
   var updateTime = function() {
-    date.tz = new Date(new Date().toLocaleString(
-          "en-US", {timeZone: timezone}
-        ));
-    date.tz = $.formatDateTime('DD, MM dd, yy gg:ii a', date.tz);
-    dateElement.html(date.tz);
-    window.setTimeout(updateTime, 1000);
+    try {
+      date.tz = new Date(new Date().toLocaleString(
+            "en-US", {timeZone: timezone}
+          ));
+      date.tz = $.formatDateTime('DD, MM dd, yy gg:ii a', date.tz);
+      if (date.tz.indexOf('undefined') >= 0) {
+        dateElement.css('display', 'none');
+        locationElement.addClass('no-time');
+        return
+      }
+      dateElement.html(date.tz);
+      window.setTimeout(updateTime, 1000);
+    } catch(e) {
+      dateElement.css('display', 'none');
+      locationElement.addClass('no-time');
+      console.log(e);
+    }      
   };
 
   function showThreeDayForecast(forecastData) {
