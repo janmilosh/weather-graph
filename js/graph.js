@@ -219,7 +219,7 @@ $(function() {
   //makeGraph function is called from success function of ajax call.
   function makeGraph(response) {
 
-    var margin = {top: 70, right: 45, bottom: 75, left: 75};
+    var margin = {top: 45, right: 35, bottom: 75, left: 75};
     var height = svgHeight - margin.top - margin.bottom;
     var width = svgWidth - margin.left - margin.right;
 
@@ -426,8 +426,9 @@ $(function() {
       .attr('class', 'title')
       .attr('x', (width/2))
       .attr('y', 0 - (margin.top/2))
+      .attr('dy', '10')
       .attr('text-anchor', 'middle')
-      .text('Hourly Temperature');
+      .text('Hourly Temperatures');
 
     svgSelection.append('text')
       .attr('class', 'label')

@@ -158,7 +158,6 @@ ul li:nth-child(odd) {
 
 .graph {
   padding: 0 15px;
-  max-width: 832px;
   float: left;
 }
 
@@ -368,6 +367,12 @@ text.label {
   #three-day-weather {
     margin-bottom: 0;
   }
+
+  .graph {
+    width: 100%;
+    float: none;
+  }
+
 }
 
 @media (max-width: 800px) {
