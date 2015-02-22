@@ -20,8 +20,12 @@ $(function() {
   $(window).resize(function() {
     setSizes();
   });
-
-  getWeatherData('/q/zmw:43085.2.99999', 'Columbus, Ohio');
+  if ($.cookie('location')) {
+    var locationText = $.cookie('location');
+  } else {
+    var locationText = 'Columbus, Ohio';
+  }
+  getWeatherData('/q/zmw:43085.2.99999', locationText);
 
   locationInput.keyup(function() {
     var query = locationInput.val();
@@ -65,6 +69,7 @@ $(function() {
   $('body').on('click', '.location-list li', function() {
     var location = $(this).data('location');
     var locationText = $(this).text();
+    $.cookie('location', locationText);
     $('#location-results').empty();
     $('svg').empty();
     locationInput.val(null);
@@ -144,8 +149,6 @@ $(function() {
 
   function showHourlyForecast(forecastData, locationText) {
     var items = [];
-    console.log(locationText);
-    console.log(forecastData);
     $('.hourly-wrapper h1').html(locationText + ' &ndash; ' + forecastData[0].FCTTIME.pretty)
     $('#hourly-forecast').empty();
     $.each(forecastData, function(index, data) {
