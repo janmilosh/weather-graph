@@ -189,11 +189,16 @@ table, th, td {
   margin: 0 auto 30px;
 }
 
-.hourly-wrapper tr:nth-child(even) {
+.hourly-wrapper tr:nth-child(odd) {
   background: #f4f4f4;
 }
 
-.hourly-wrapper td {
+.hourly-wrapper th {
+  background: white;
+}
+
+.hourly-wrapper td,
+.hourly-wrapper th {
   padding: 4px 10px;
   border: 1px solid #5A78BB;
   font-size: 1.2em;

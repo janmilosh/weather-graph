@@ -20,12 +20,15 @@ $(function() {
   $(window).resize(function() {
     setSizes();
   });
-  if ($.cookie('location')) {
-    var locationText = $.cookie('location');
+  
+  if ($.cookie('location') && $.cookie('location_text')) {
+    var locationText = $.cookie('location_text');
+    var location = $.cookie('location')
   } else {
     var locationText = 'Columbus, Ohio';
+    var location = '/q/zmw:43085.2.99999';
   }
-  getWeatherData('/q/zmw:43085.2.99999', locationText);
+  getWeatherData(location, locationText);
 
   locationInput.keyup(function() {
     var query = locationInput.val();
@@ -69,7 +72,8 @@ $(function() {
   $('body').on('click', '.location-list li', function() {
     var location = $(this).data('location');
     var locationText = $(this).text();
-    $.cookie('location', locationText);
+    $.cookie('location', location);
+    $.cookie('location_text', locationText);
     $('#location-results').empty();
     $('svg').empty();
     locationInput.val(null);
