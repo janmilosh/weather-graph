@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding: 30px 0;
+  padding: 0 0 30px;
   background: #f1f1f1;
   color: #555;
   font-family: helvetica, sans-serif;
@@ -24,6 +24,19 @@ html {
   box-sizing: inherit;
 }
 
+.header {
+  background: #5A78BB;
+  padding: 15px 0;
+  margin-bottom: 30px;
+  min-height: 104px;
+}
+
+.header .left {
+  width: 65%;
+  display: block;
+  float:left;
+}
+
 h1, h2, h3, h4 {
   text-align: center;
   font-family: helvetica, sans-serif;
@@ -34,6 +47,18 @@ h1, h2, h3, h4 {
 
 h1 {
   font-size: 26px;
+}
+
+.header h1 {
+  font-size: 36px;
+  text-align: left;
+  color: white;
+  margin: 0;
+}
+
+.header h1.time {
+  font-size: 28px;
+  margin-top: 10px;
 }
 
 .hourly-wrapper h1 {
@@ -137,7 +162,8 @@ ul li:nth-child(odd) {
   min-width: 600px;
 }
 
-.sidebar {
+.sidebar,
+form {
   width: 356px;
   padding: 0 15px;
   float: right;
@@ -183,6 +209,10 @@ table, th, td {
   font-size: 14px;
 }
 
+table#three-day-weather {
+  margin-top: 0;
+}
+
 .hourly-wrapper table {
   width: 100%;
   max-width: 900px;
@@ -210,9 +240,8 @@ table, th, td {
 }
 
 form {
-  background: #5A78BB;
-  padding: 10px 15px 15px;
   max-width: 326px;
+  margin-top: 8px;
 }
 
 td:first-child {
@@ -306,12 +335,34 @@ text.label {
 
 @media (max-width: 1023px) {
   
+  .header {
+    min-height: 199px;
+  }
+
+  .header .left {
+    float: none;
+    width: 100%;
+  }
+
+  .header h1 {
+    text-align: center;
+  }
+
+  form {
+    float: none;
+    margin: 20px auto;
+  }
+
   .sidebar {
     float: none;
-    margin-top: 20px;
+    margin-top: 30px;
     margin-left: auto;
     margin-right: auto;
     
+  }
+
+  #three-day-weather {
+    margin-bottom: 0;
   }
 }
 
@@ -319,6 +370,11 @@ text.label {
 
   .sidebar {
     width: 100%;
+    float: none;
+  }
+
+  .graph {
+    float: none;
   }
 
 }
@@ -329,8 +385,24 @@ text.label {
     padding-top: 0;
   }
 
+  .sidebar {
+    margin-top: 0;
+  }
+
   .visible-xs {
     display: block;
+  }
+
+  .header {
+    min-height: 181px;
+  }
+
+  .header h1.time {
+    font-size: 18px;
+  }
+
+  .header h1.location {
+    font-size: 28px;
   }
 
   svg,

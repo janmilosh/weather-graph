@@ -3,6 +3,9 @@ $(function() {
   var wuApiKey = 'e7abc77487d7e3eb';
   var wuPrefix = 'http://api.wunderground.com/api/';
   var locationInput = $('#location-input');
+  var timezone;
+  var response;
+  var locationText;
 
   function setSizes() {
     windowWidth = $(window).width();
@@ -15,20 +18,36 @@ $(function() {
     }
     svgHeight = svgWidth * 5/8;
   }
-
-  setSizes();
-  $(window).resize(function() {
-    setSizes();
-  });
   
   if ($.cookie('location') && $.cookie('location_text')) {
-    var locationText = $.cookie('location_text');
+    locationText = $.cookie('location_text');
     var location = $.cookie('location')
   } else {
-    var locationText = 'Columbus, Ohio';
+    locationText = 'Columbus, Ohio';
     var location = '/q/zmw:43085.2.99999';
   }
-  getWeatherData(location, locationText);
+
+  setSizes();
+  getWeatherData(location);
+
+  $(window).resize(function() {
+    setSizes();
+    $('svg').empty();
+    if (windowWidth > 600 && response) {
+      populatePageElements(response);
+    }
+  });
+
+  $('body').on('click', '.location-list li', function() {
+    var location = $(this).data('location');
+    locationText = $(this).text();
+    $.cookie('location', location);
+    $.cookie('location_text', locationText);
+    $('#location-results').empty();
+    $('svg').empty();
+    locationInput.val(null);
+    getWeatherData(location);
+  });
 
   locationInput.keyup(function() {
     var query = locationInput.val();
@@ -69,18 +88,7 @@ $(function() {
     }).appendTo('#location-results');
   };
 
-  $('body').on('click', '.location-list li', function() {
-    var location = $(this).data('location');
-    var locationText = $(this).text();
-    $.cookie('location', location);
-    $.cookie('location_text', locationText);
-    $('#location-results').empty();
-    $('svg').empty();
-    locationInput.val(null);
-    getWeatherData(location, locationText);
-  });
-
-  function getWeatherData(location, locationText) {
+  function getWeatherData(location) {
     var weatherRequest = wuPrefix + wuApiKey + '/hourly/forecast/almanac' + location + '.json';
 
     //jQuery ajax request for the weather data.
@@ -89,13 +97,9 @@ $(function() {
 
         dataType: 'jsonp',
 
-        success: function( response ) {
-          showThreeDayForecast(response.forecast.txt_forecast.forecastday, locationText);
-          showSimpleForecast(response.forecast.simpleforecast.forecastday)
-          showHourlyForecast(response.hourly_forecast, locationText)
-          if (windowWidth > 600) {
-            makeGraph(response, locationText);
-          }
+        success: function( data ) {
+          response = data;
+          populatePageElements(response);
         },
 
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -104,7 +108,32 @@ $(function() {
     });
   }
 
-  function showThreeDayForecast(forecastData, locationText) {
+  function populatePageElements(response) {
+    showThreeDayForecast(response.forecast.txt_forecast.forecastday);
+    showSimpleForecast(response.forecast.simpleforecast.forecastday)
+    showHourlyForecast(response.hourly_forecast)
+    timezone = response.forecast.simpleforecast.forecastday[0].date.tz_long;
+    
+    $('.header h1.location').html('Weather for ' + locationText);
+    updateTime();
+    if (windowWidth > 600) {
+      makeGraph(response, locationText);
+    }
+  }
+
+  //The Time function for the header clock
+  var date = {};
+  var dateElement = $('.header h1.time');
+  var updateTime = function() {
+    date.tz = new Date(new Date().toLocaleString(
+          "en-US", {timeZone: timezone}
+        ));
+    date.tz = $.formatDateTime('DD, MM dd, yy gg:ii a', date.tz);
+    dateElement.html(date.tz);
+    window.setTimeout(updateTime, 1000);
+  };
+
+  function showThreeDayForecast(forecastData) {
     var items = [];
     $('#three-day-weather').empty();
     $('#location-results').empty();
@@ -151,9 +180,9 @@ $(function() {
     $('#simple-forecast').append(divString);
   }
 
-  function showHourlyForecast(forecastData, locationText) {
+  function showHourlyForecast(forecastData) {
     var items = [];
-    $('.hourly-wrapper h1').html(locationText + ' &ndash; ' + forecastData[0].FCTTIME.pretty)
+    $('.hourly-wrapper h1').html(locationText + ' Hourly Forecast');
     $('#hourly-forecast').empty();
     $.each(forecastData, function(index, data) {
       if(data.snow.english > 0 ) {
@@ -176,7 +205,7 @@ $(function() {
   }
 
   //makeGraph function is called from success function of ajax call.
-  function makeGraph(response, locationText) {
+  function makeGraph(response) {
 
     var margin = {top: 70, right: 45, bottom: 75, left: 75};
     var height = svgHeight - margin.top - margin.bottom;
@@ -207,6 +236,7 @@ $(function() {
 
       //Puts the dates in the proper format
       var hourlyDataArray = response.hourly_forecast;
+
       hourlyDataArray.forEach(function(item) {
         var timeBase = item.FCTTIME;
 
@@ -218,7 +248,7 @@ $(function() {
         var date = [hour, day, month, year].join(' ');
         item.time = parseDate(date);
 
-        item.temp = parseInt(item.temp.english, 10);
+        item.temperature = parseInt(item.temp.english, 10);
       });
 
       var startDateBase = hourlyDataArray[0].FCTTIME;
@@ -231,8 +261,8 @@ $(function() {
 
       //We need to find max and min temps for the hourly and the historical data.
       //First find max and min for hourly, then put values in array and find overall range.
-      var hourlyMax = d3.max(hourlyDataArray, function(d) { return d.temp });
-      var hourlyMin = d3.min(hourlyDataArray, function(d) { return d.temp });
+      var hourlyMax = d3.max(hourlyDataArray, function(d) { return d.temperature });
+      var hourlyMin = d3.min(hourlyDataArray, function(d) { return d.temperature });
       var tempMaxMinArray = [hourlyMax, hourlyMin, recordHigh, normalHigh, recordLow, normalLow];
       var yRange = d3.extent(tempMaxMinArray, function(d) { return d });
       //extend the range a bit to accommodate text labels on the record high/low lines
@@ -350,7 +380,7 @@ $(function() {
     var line = d3.svg.line()
       .interpolate('basis')
       .x(function(d) { return xScale(d.time); })
-      .y(function(d) { return yScale(d.temp); });
+      .y(function(d) { return yScale(d.temperature); });
 
     svgSelection.append('path')
       .datum(hourlyDataArray)
@@ -385,7 +415,7 @@ $(function() {
       .attr('x', (width/2))
       .attr('y', 0 - (margin.top/2))
       .attr('text-anchor', 'middle')
-      .text(locationText + ' Hourly Forecast');
+      .text('Hourly Temperature');
 
     svgSelection.append('text')
       .attr('class', 'label')
@@ -409,7 +439,7 @@ $(function() {
       .attr('y', height + margin.bottom/2)
       .attr('dy', '16')
       .attr('text-anchor', 'middle')  
-      .text(locationText + ' Local Time');
+      .text('Local Time');
 
     svgSelection.append('text')
       .attr('class', 'label')

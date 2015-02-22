@@ -8,6 +8,23 @@
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
+  <div class="header clearfix">
+    <div class="wrapper clearfix">
+      <div class="left">
+        <h1 class="location">&nbsp;</h1>
+        <h1 class="time">&nbsp;</h1>
+      </div>        
+      <form name="location-input">
+        <label>Try any city in the world:</label>
+        <input type="text"
+               name="location"
+               id="location-input"
+               placeholder="Type a city"
+               autocomplete="off">
+        <div id="location-results"></div>
+      </form>
+    </div>
+  </div>
   <div class="wrapper clearfix">
     <div class="row clearfix">
       <div class="graph">
@@ -47,16 +64,6 @@
         </div>
       </div>
       <div class="sidebar clearfix">
-        <h1 class="visible-xs">Four-Day Weather Forecast</h1>
-        <form name="location-input">
-          <label>Try any city in the world:</label>
-          <input type="text"
-                 name="location"
-                 id="location-input"
-                 placeholder="Type a city"
-                 autocomplete="off">
-          <div id="location-results"></div>
-        </form>
         <table id="three-day-weather">
         </table>
       </div> 
@@ -86,6 +93,7 @@
   <script src="js/d3.min.js"></script>
   <script src="js/jquery-1.11.1.min.js"></script>
   <script src="js/jquery.cookie.js"></script>
+  <script src="js/jquery.formatDateTime.js"></script>
   <script src="js/graph.js"></script>
 </body>
 </html>
