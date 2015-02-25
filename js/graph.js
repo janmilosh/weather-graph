@@ -130,7 +130,7 @@ $(function() {
       date.tz = new Date(new Date().toLocaleString(
             "en-US", {timeZone: timezone}
           ));
-      date.tz = $.formatDateTime('DD, MM dd, yy gg:ii a', date.tz);
+      date.tz = $.formatDateTime('DD, MM d, yy g:ii a', date.tz);
       if (date.tz.indexOf('undefined') >= 0) {
         dateElement.css('display', 'none');
         locationElement.addClass('no-time');
