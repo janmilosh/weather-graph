@@ -336,6 +336,12 @@ text.label {
   top: -8px;
 }
 
+@media (max-width:1060px) and (min-width: 1023px) {
+  .panel h4 {
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 1023px) {
   
   .header {
