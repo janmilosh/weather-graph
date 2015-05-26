@@ -112,7 +112,8 @@ $(function() {
 
   function populatePageElements(response) {
     showThreeDayForecast(response.forecast.txt_forecast.forecastday);
-    showSimpleForecast(response.forecast.simpleforecast.forecastday)
+    showSimpleForecast(response.forecast.simpleforecast.forecastday);
+    $('.panel h4').attr('width', svgWidth/4);
     showHourlyForecast(response.hourly_forecast)
     timezone = response.forecast.simpleforecast.forecastday[0].date.tz_long;
     $('.header h1.location').html('Weather for ' + locationText);
@@ -180,7 +181,7 @@ $(function() {
     $.each(forecastData, function(index, data) {
       items.push(
         '<div class="simple">' +
-          '<div class="panel">' +
+          '<div class="panel" style="width: ' + (svgWidth-90)/4 + 'px;">' +
             '<h3>' + data.date.weekday + '</h3>' +
             '<h2>' + data.high.fahrenheit + '/' + data.low.fahrenheit + ' °F</h2>' +
             '<h4>' + data.conditions + '</h4>' +
