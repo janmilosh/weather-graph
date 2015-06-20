@@ -14,7 +14,7 @@ $(function() {
     wrapperWidth = $('.wrapper').width();
     sidebarWidth = $('.sidebar').width();
     if (windowWidth >= 1024) {
-      svgWidth = wrapperWidth - sidebarWidth - 30;
+      svgWidth = wrapperWidth - sidebarWidth - 31;
     } else {
       svgWidth = wrapperWidth;
     }
