@@ -165,8 +165,15 @@ ul li:nth-child(odd) {
   min-width: 600px;
 }
 
-.sidebar,
 form {
+  margin-top: 8px;
+  padding: 0;
+  max-width: 100%;  
+  width: 326px;
+  float: right;
+}
+
+.sidebar {
   width: 356px;
   padding: 0 15px;
   float: right;
@@ -240,11 +247,6 @@ table#three-day-weather {
 
 #simple-forecast {
   margin-bottom: 20px;
-}
-
-form {
-  max-width: 326px;
-  margin-top: 8px;
 }
 
 td:first-child {
