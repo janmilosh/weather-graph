@@ -179,6 +179,17 @@ form {
   float: right;
 }
 
+.hourly-section {
+  margin: 30px 0;
+  padding: 0 0 20px;
+  background: #9DAFD8;
+}
+
+.hourly-section h1 {
+  color: white;
+  font-size: 28px;
+}
+
 input {
   width: 100%;
 }
