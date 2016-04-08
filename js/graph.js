@@ -1,6 +1,6 @@
 $(function() {
   var windowWidth, wrapperWidth, sidebarWidth, svgWidth, svgHeight;
-  var wuApiKey = 'e7abc77487d7e3eb';
+  var num = 'daea4dbf8e2953aa';
   var wuPrefix = 'http://api.wunderground.com/api/';
   var locationInput = $('#location-input');
   var timezone;
@@ -91,7 +91,7 @@ $(function() {
   };
 
   function getWeatherData(location) {
-    var weatherRequest = wuPrefix + wuApiKey + '/hourly/forecast/almanac' + location + '.json';
+    var weatherRequest = wuPrefix + num + '/hourly/forecast/almanac' + location + '.json';
 
     //jQuery ajax request for the weather data.
     $.ajax({
