@@ -43,8 +43,8 @@ $(function() {
   $('body').on('click', '.location-list li', function() {
     var location = $(this).data('location');
     locationText = $(this).text();
-    $.cookie('location', location);
-    $.cookie('location_text', locationText);
+    $.cookie('location', location, { expires: 3650 });
+    $.cookie('location_text', locationText, { expires: 3650 });
     $('#location-results').empty();
     $('svg').empty();
     locationInput.val(null);
