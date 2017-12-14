@@ -1,6 +1,6 @@
 $(function() {
   var windowWidth, wrapperWidth, sidebarWidth, svgWidth, svgHeight;
-  var num = 'daea4dbf8e2953aa';
+  var num = 'b8d5c0fe6df8fd48';
   var wuPrefix = 'http://api.wunderground.com/api/';
   var locationInput = $('#location-input');
   var timezone;
